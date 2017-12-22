@@ -2,16 +2,21 @@ var express = require('express')
 var fs = require("fs")
 var path = require("path")
 var zipFolder = require('zip-folder');
-var urls = require(path.join(__dirname, 'assets.json'))
+var bodyParser = require('body-parser');
 var app = express()
 request = require('request')
+
+app.use(bodyParser.json()); // support json encoded bodies
+app.use(bodyParser.urlencoded({ extended: true })); // support encoded bodies
 app.set('port', (process.env.PORT || 5000))
 
-app.get('/', function (req, res) {
+app.post('/downloadassets', function (req, res) {
+    res.send(req.body);
+    urls = req.body
     dirName = createDir();
-    for (i = 0; i < Object.keys(urls.assets).length; i++) {
+    for (i = 0; i < urls.length; i++) {
         //console.log(urls.assets[i]['secure_url']);
-        downloadImages(urls.assets[i]['secure_url'],dirName);
+        downloadImages(urls[i],dirName);
     }
 
     // zipFolder('/path/to/the/folder', '/path/to/archive.zip', function(err) {

@@ -3,6 +3,7 @@
   "version": "0.0.1",
   "main": "server.js",
   "dependencies": {
+    "body-parser": "^1.18.2",
     "express": "^4.16.2",
     "request": "^2.83.0",
     "zip-folder": "^1.0.0"
