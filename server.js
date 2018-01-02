@@ -28,6 +28,19 @@ app.post('/downloadassets', function (req, res) {
 app.listen(app.get('port'), function () {
     console.log('Reporting Server is running on port', app.get('port'))
 });
+//run function to set up required folders
+appSetUp()
+
+function appSetUp(){
+//create the public folder and the assets folder 
+if (!fs.existsSync('public')){
+    fs.mkdirSync('public');
+}
+
+if (!fs.existsSync('public/assets')){
+    fs.mkdirSync('public/assets');
+}
+}
 
 function downloadImages(url, dirName, i) {
 
