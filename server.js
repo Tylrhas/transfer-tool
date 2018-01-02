@@ -10,6 +10,8 @@ var URL = 'localhost:5000'
 app.use(bodyParser.json()); // support json encoded bodies
 app.use(bodyParser.urlencoded({ extended: true })); // support encoded bodies
 app.set('port', (process.env.PORT || 5000))
+//run function to set up required folders
+appSetUp()
 //set the contents of the public folder to be accessable to the public
 app.use(express.static(__dirname + '/public'))
 
@@ -28,8 +30,6 @@ app.post('/downloadassets', function (req, res) {
 app.listen(app.get('port'), function () {
     console.log('Reporting Server is running on port', app.get('port'))
 });
-//run function to set up required folders
-appSetUp()
 
 function appSetUp(){
 //create the public folder and the assets folder 
