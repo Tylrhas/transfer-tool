@@ -43,7 +43,7 @@ function downloadImages(url, dirName, i) {
         console.log('done');
         if (i === urls.length -1){
             console.log('all done');
-            zipFolder('./public.assets/'+dirName, './public/assets/'+dirName+'.zip', function(err) {
+            zipFolder('./public/assets/'+dirName, './public/assets/'+dirName+'.zip', function(err) {
                 if(err) {
                     console.log('oh no!', err);
                 } else {
