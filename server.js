@@ -36,7 +36,7 @@ function downloadImages(url, dirName, i) {
             console.log('content-type:', res.headers['content-type']);
             console.log('content-length:', res.headers['content-length']);
 
-            request(uri).pipe(fs.createWriteStream('public/assets/'+dirName+"/"+filename)).on('close', callback);
+            request(uri).pipe(fs.createWriteStream('./public/assets/'+dirName+"/"+filename)).on('close', callback);
         });
     };
     download(url, getFileName(url), function () {
@@ -65,8 +65,8 @@ function createDir(){
     var date = new Date();
     var datetime = date.getFullYear()+"-"+ date.getDay()+"-"+date.getMonth()+"-"+date.getTime();
     var dir = 'asset_download-'+datetime;
-    if (!fs.existsSync('public/assets/'+dir)){
-        fs.mkdirSync('public/assets/'+dir);
+    if (!fs.existsSync('./public/assets/'+dir)){
+        fs.mkdirSync('./public/assets/'+dir);
     }
     return dir;
 }
