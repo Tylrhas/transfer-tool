@@ -5,8 +5,10 @@ var zipFolder = require('zip-folder');
 var bodyParser = require('body-parser');
 var app = express()
 request = require('request')
+const EventEmitter = require('events');
+class MyEmitter extends EventEmitter { }
+const myEmitter = new MyEmitter();
 var URL = process.env.appURL
-
 
 app.use(bodyParser.json()); // support json encoded bodies
 app.use(bodyParser.urlencoded({ extended: true })); // support encoded bodies
@@ -25,10 +27,13 @@ app.post('/downloadassets', function (req, res) {
     }
     //listen for event
     zipLocation = URL + '/assets/' + dirName + '.zip';
-    res.json({
-        'url': zipLocation,
-        'status': 'sucess'
-    });
+
+    myEmitter.once('zipComplete', () => {
+        res.json({
+            'url': zipLocation,
+            'status': 'sucess'
+        });
+    })
 });
 
 app.listen(app.get('port'), function () {
@@ -64,7 +69,7 @@ function downloadImages(url, dirName, i) {
                 if (err) {
                     console.log('oh no!', err);
                 } else {
-                    console.log('EXCELLENT');
+                    myEmitter.emit('zipComplete');
                 }
             });
         }
