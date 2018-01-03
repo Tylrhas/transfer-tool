@@ -5,7 +5,7 @@ var zipFolder = require('zip-folder');
 var bodyParser = require('body-parser');
 var app = express()
 request = require('request')
-var URL = 'localhost:5000'
+var URL = process.env.appURL
 
 app.use(bodyParser.json()); // support json encoded bodies
 app.use(bodyParser.urlencoded({ extended: true })); // support encoded bodies
