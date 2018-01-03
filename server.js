@@ -24,7 +24,10 @@ app.post('/downloadassets', function (req, res) {
     }
     //listen for event
     zipLocation = URL+'/assets/'+dirName+'.zip';
-        res.send(zipLocation);
+        res.json({
+            'url':zipLocation,
+            'status':'sucess'
+        });
 });
 
 app.listen(app.get('port'), function () {
