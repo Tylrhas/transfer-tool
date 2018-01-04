@@ -121,6 +121,7 @@ function createDir() {
     }
     return dir;
 }
+
 function fileExists(fileName, alreadyDownloaded) {
     return alreadyDownloaded.includes(fileName);
 }
