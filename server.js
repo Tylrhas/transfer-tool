@@ -1,11 +1,14 @@
 var express = require('express')
 var fs = require("fs")
 var path = require("path")
-var zipFolder = require('zip-folder');
-var bodyParser = require('body-parser');
+var zipFolder = require('zip-folder')
+var bodyParser = require('body-parser')
+var schedule = require('node-schedule')
+var request = require('request')
 var app = express()
-request = require('request')
-const EventEmitter = require('events');
+var rimraf = require('rimraf')
+var EventEmitter = require('events')
+
 class MyEmitter extends EventEmitter { }
 const myEmitter = new MyEmitter();
 var URL = process.env.appURL
@@ -121,3 +124,10 @@ function createDir() {
 function fileExists(fileName, alreadyDownloaded) {
     return alreadyDownloaded.includes(fileName);
 }
+
+schedule.scheduleJob('0 0 * * *', function(){
+    console.log('removing the dir');
+    lrimraf('./public/assets/', function () {
+        appSetUp()
+     });
+  });
