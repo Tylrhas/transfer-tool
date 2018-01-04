@@ -8,8 +8,8 @@ request = require('request')
 const EventEmitter = require('events');
 class MyEmitter extends EventEmitter { }
 const myEmitter = new MyEmitter();
-// var URL = process.env.appURL
-URL = 'test.com'
+var URL = process.env.appURL
+//URL = 'test.com'
 
 app.use(bodyParser.json()); // support json encoded bodies
 app.use(bodyParser.urlencoded({ extended: true })); // support encoded bodies
