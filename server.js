@@ -8,7 +8,8 @@ request = require('request')
 const EventEmitter = require('events');
 class MyEmitter extends EventEmitter { }
 const myEmitter = new MyEmitter();
-var URL = process.env.appURL
+// var URL = process.env.appURL
+URL = 'test.com'
 
 app.use(bodyParser.json()); // support json encoded bodies
 app.use(bodyParser.urlencoded({ extended: true })); // support encoded bodies
@@ -19,16 +20,17 @@ appSetUp()
 app.use(express.static(__dirname + '/public'))
 
 app.post('/downloadassets', function (req, res) {
-    urls = req.body
+    urls = req.body;
+    alreadyDownloaded = [];
     dirName = createDir();
+
     for (i = 0; i < urls.length; i++) {
-        //console.log(urls.assets[i]['secure_url']);
-        downloadImages(urls[i], dirName, i);
+        console.log('i is '+ i);
+        downloadImages(urls[i], dirName, urls.length, alreadyDownloaded);
     }
     //listen for event
-    zipLocation = URL + '/assets/' + dirName + '.zip';
-
     myEmitter.once('zipComplete', () => {
+        zipLocation = URL + '/assets/' + dirName + '.zip';
         res.json({
             'url': zipLocation,
             'status': 'sucess'
@@ -51,42 +53,60 @@ function appSetUp() {
     }
 }
 
-function downloadImages(url, dirName, i) {
-
+function downloadImages(url, dirName, numberOfFiles, alreadyDownloaded) {
     var download = function (uri, filename, callback) {
         request.head(uri, function (err, res, body) {
-            console.log('content-type:', res.headers['content-type']);
-            console.log('content-length:', res.headers['content-length']);
-
             request(uri).pipe(fs.createWriteStream('./public/assets/' + dirName + "/" + filename)).on('close', callback);
         });
     };
-    download(url, getFileName(url), function () {
-        console.log('done');
-        if (i === urls.length - 1) {
-            console.log('all done');
-            zipFolder('./public/assets/' + dirName, './public/assets/' + dirName + '.zip', function (err) {
-                if (err) {
-                    console.log('oh no!', err);
-                } else {
-                    myEmitter.emit('zipComplete');
-                }
-            });
-        }
+    download(url, getFileName(url, dirName, alreadyDownloaded), function () {
+        dir = './public/assets/' + dirName;
+        fs.readdir(dir, (err, files) => {
+            if (numberOfFiles === files.length) {
+                console.log('all done');
+                zipFolder('./public/assets/' + dirName, './public/assets/' + dirName + '.zip', function (err) {
+                    if (err) {
+                        console.log('oh no!', err);
+                    } else {
+                        console.log('complete')
+                        myEmitter.emit('zipComplete');
+                    }
+                });
+            }
+        })
     });
 
 }
 
-function getFileName(url) {
+function getFileName(url, dirName, alreadyDownloaded) {
     //split the url to just get the file name
     urlSplit = url.split("/");
     index = urlSplit.length - 1;
     //strip off the id that cloudinary adds
     splitFileName = urlSplit[index].split('.');
     newfile = splitFileName[0].substring(0, splitFileName[0].length - 7);
-    //add the file extension back in
-    fileWithFormat = newfile + '.' + splitFileName[1];
-    return fileWithFormat;
+    //check if the filename is in use
+    console.log(newfile + '.' + splitFileName[1]);
+    console.log(fileExists(newfile + '.' + splitFileName[1], alreadyDownloaded));
+    if (fileExists(newfile + '.' + splitFileName[1], alreadyDownloaded)) {
+        e = 2;
+        while (fileExists(newfile + '-' + e + '.' + splitFileName[1], alreadyDownloaded)) {
+            console.log('increasing i')
+            e++
+        }
+        //add the file extension back in
+        renamedFile = newfile + '-' + e + '.' + splitFileName[1];
+        alreadyDownloaded.push(renamedFile);
+        return renamedFile;
+    }
+    else {
+        //add the file extension back in
+        fileWithFormat = newfile + '.' + splitFileName[1];
+        //add file to download
+        alreadyDownloaded.push(fileWithFormat);
+        return fileWithFormat;
+    }
+
 }
 
 function createDir() {
@@ -97,4 +117,7 @@ function createDir() {
         fs.mkdirSync('./public/assets/' + dir);
     }
     return dir;
+}
+function fileExists(fileName, alreadyDownloaded) {
+    return alreadyDownloaded.includes(fileName);
 }
